@@ -112,7 +112,10 @@ def scrape_site():
                 driver.execute_script(f"window.scrollBy(0, 800);")
                 time.sleep(random.uniform(1,4))
 
-            # human_behavior(driver)
+            human_behavior(driver)
+
+            base_dir = os.path.join(os.getcwd(), "data_files")
+            os.makedirs(base_dir, exist_ok=True)
 
             elem=driver.find_elements(By.CLASS_NAME,'cust-job-tuple')
             for el in elem:
@@ -122,8 +125,11 @@ def scrape_site():
                 count+=1
 
                 num=num+1
-                with open(f"C:\\Emergent\\webscraping\\scrapers\\githab_puch_scrapers\\Naukri.com_scraper\\Data_files\\{num}.html","w",encoding='utf-8') as f:
-                     f.write(data)
+
+                file_path = os.path.join(base_dir, f"{num}.html")
+
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.write(data)
     
             print(f"Succesful Title : {driver.title}")
 
