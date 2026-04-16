@@ -11,6 +11,9 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 count=0
 
+pages=int(input("Enter Number Of Pages : "))
+limit=int(input("Emter element limit : "))
+
 def human_behavior(driver):
     print("Human behavior (Mouse Movement) start...")
     actions = ActionChains(driver)
@@ -44,6 +47,8 @@ sys.excepthook = quiet_exit
 
 def get_driver():
     options = uc.ChromeOptions()
+
+    print("Start Brouser")
     
     # 1. List of random user-agent (so that device any time different
     user_agents = [
@@ -92,10 +97,10 @@ def scrape_site():
         
         global count
         num=0
-        for i in range(1):
-            url=f"https://www.naukri.com/jobs-in-india-{i}?clusters=wfhType%2CfunctionalAreaGid&wfhType=2&functionAreaIdGid=14"
+        for i in range(1,pages+1):
+            url = f"https://www.naukri.com/jobs-in-india-{i}"
 
-            print(f"Opning the target : {url}")
+            print(f"Opning the target: {url}")
             driver.get(url)
             
             # 4.   Random weating(2 to 4 seconds)
@@ -111,11 +116,13 @@ def scrape_site():
 
             elem=driver.find_elements(By.CLASS_NAME,'cust-job-tuple')
             for el in elem:
+                if count >= limit:
+                   break
                 data=el.get_attribute('outerHTML')
                 count+=1
 
                 num=num+1
-                with open(f"C:\\Emergent\\webscraping\\scrapers\\Seleniuam scrapers\\Naukri_data\\{num}.html","w",encoding='utf-8') as f:
+                with open(f"C:\\Emergent\\webscraping\\scrapers\\githab_puch_scrapers\\Naukri.com_scraper\\Data_files\\{num}.html","w",encoding='utf-8') as f:
                      f.write(data)
     
             print(f"Succesful Title : {driver.title}")
@@ -127,35 +134,13 @@ def scrape_site():
     finally:
         try:
             driver.quit()
+            time.sleep(1)   # 👈 important
         except:
             pass
         print("Complete Cleanup.")
-        os._exit(0) # to exite immediatly without error
 
 if __name__ == "__main__":
         scrape_site()
                 
 # ----------------------------------------------------------------------------------------------------------------------------------------
 
-
-from bs4 import BeautifulSoup
-import pandas as pd
-
-data_list=[]
-for i in range(1,20):
-    with open(f"C:\\Emergent\\webscraping\\scrapers\\Seleniuam scrapers\\Naukri_data\\{i}.html","r",encoding='utf-8') as f:
-         d=f.read()  
-         soup=BeautifulSoup(d,'html.parser')
-    data_dic={
-         'name':soup.find(class_="title").text,
-         'review':soup.find('div',class_="row2").text.strip()
-         }
-    data_list.append(data_dic)
-
-data=pd.DataFrame(data_list)
-
-print(data)
-
-data.to_csv(r'C:\Emergent\webscraping\scrapers\Seleniuam scrapers\\Naukri_data\data.csv', index=False, encoding='utf-8')
-
-print("csv created succesfully")
